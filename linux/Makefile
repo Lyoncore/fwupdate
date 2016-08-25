@@ -36,7 +36,7 @@ BUILDFLAGS := $(CFLAGS) -Wall -Wextra -Werror -Wno-error=cpp \
 	-DLOCALEDIR=\"$(localedir)\" -D_GNU_SOURCE \
 	-DFWUP_EFI_DIR_NAME=\"$(EFIDIR)\"  \
 	-I$(TOPDIR)/linux/include -iquote$(TOPDIR)/include/ \
-	$(foreach pklib,$(PKLIBS), $(shell pkg-config --cflags $(pklib))) \
+	-I$(LIBDIR)/usr/include \
 	$(PJONES)
 
 BINTARGETS=fwupdate
