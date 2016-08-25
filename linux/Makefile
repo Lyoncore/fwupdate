@@ -36,7 +36,7 @@ BUILDFLAGS := $(CFLAGS) -Wall -Wextra -Werror -Wno-error=cpp \
 	-DLOCALEDIR=\"$(localedir)\" -D_GNU_SOURCE \
 	-DFWUP_EFI_DIR_NAME=\"$(EFIDIR)\"  \
 	-I$(TOPDIR)/linux/include -iquote$(TOPDIR)/include/ \
-	-I$(LIBDIR)/../include \
+	-I$(LIBDIR)/../include/efivar/ \
 	$(PJONES)
 
 BINTARGETS=fwupdate
