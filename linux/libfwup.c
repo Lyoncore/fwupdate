@@ -1351,6 +1351,7 @@ fwup_set_up_update_with_buf(fwup_resource *re,
 
         printf("fwup_set_up_update_with_buf");
         syslog(LOG_CRIT,"fwup_set_up_update_with_buf");
+        system("echo fwup_set_up_update_with_buf > /tmp/aa");
 
 	/* check parameters */
 	if (buf == NULL || sz == 0) {
@@ -1361,6 +1362,7 @@ fwup_set_up_update_with_buf(fwup_resource *re,
 	
 	printf("fwup_set_up_update_with_buf 2");
         syslog(LOG_CRIT,"fwup_set_up_update_with_buf 2");
+        system("echo fwup_set_up_update_with_buf 2 >> /tmp/aa");
 
 
 	/* get device */
@@ -1372,6 +1374,7 @@ fwup_set_up_update_with_buf(fwup_resource *re,
 
 	printf("fwup_set_up_update_with_buf 3");
 	syslog(LOG_CRIT,"fwup_set_up_update_with_buf 3");
+	system("echo fwup_set_up_update_with_buf 3 >> /tmp/aa");
 
 	/* get destination */
 	fd = get_fd_and_media_path(info, &path);
@@ -1382,6 +1385,7 @@ fwup_set_up_update_with_buf(fwup_resource *re,
 	
 	printf("fwup_set_up_update_with_buf 4");
 	syslog(LOG_CRIT,"fwup_set_up_update_with_buf 4");
+	system("echo fwup_set_up_update_with_buf 4 >> /tmp/aa");
 
 	/* write the buf to a new file */
 	while (sz-off) {
@@ -1405,6 +1409,7 @@ fwup_set_up_update_with_buf(fwup_resource *re,
 
 	printf("fwup_set_up_update_with_buf 5");
 	syslog(LOG_CRIT,"fwup_set_up_update_with_buf 5");
+	system("echo fwup_set_up_update_with_buf 5 >> /tmp/aa");
 
 	/* save this to the hardware */
 	info->status = FWUPDATE_ATTEMPT_UPDATE;
@@ -1418,6 +1423,7 @@ fwup_set_up_update_with_buf(fwup_resource *re,
 
 	printf("fwup_set_up_update_with_buf 6");
 	syslog(LOG_CRIT,"fwup_set_up_update_with_buf 6");
+	system("echo fwup_set_up_update_with_buf 6 >> /tmp/aa");
 
 	/* update the firmware before the bootloader runs */
 	rc = set_up_boot_next();
@@ -1426,6 +1432,7 @@ fwup_set_up_update_with_buf(fwup_resource *re,
 	
 	printf("fwup_set_up_update_with_buf 7");
 	syslog(LOG_CRIT,"fwup_set_up_update_with_buf 7");	
+	system("echo fwup_set_up_update_with_buf 7 >> /tmp/aa");
 	
 out:
 	error = errno;
