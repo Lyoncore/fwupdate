@@ -28,7 +28,7 @@
 #define CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE   0x00020000
 #define CAPSULE_FLAGS_INITIATE_RESET          0x00040000
 
-int verbose = 0;
+int verbose = 2;
 int quiet = 0;
 
 static int

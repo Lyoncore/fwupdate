@@ -1,4 +1,4 @@
-/*
+i/*
  * libfw - library interface to apply firmware updates
  *
  * Copyright 2015 Red Hat, Inc.
@@ -29,7 +29,7 @@
 #include "ucs2.h"
 #include "fwup-efi.h"
 
-static int verbose;
+static int verbose=2;
 #include "error.h"
 
 #ifdef FWUPDATE_HAVE_LIBSMBIOS__
