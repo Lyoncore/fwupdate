@@ -1153,23 +1153,28 @@ set_efidp_header(update_info *info, const char *path)
 	ssize_t sz;
 	uint8_t *dp_buf = NULL;
 
+	syslog(LOG_CRIT,"set_efidp_header 1");
+
 	/* get the size of the path first */
 	req = efi_generate_file_device_path(NULL, 0, path,
 				EFIBOOT_OPTIONS_IGNORE_FS_ERROR |
 				EFIBOOT_ABBREV_HD);
 	if (req < 0) {
 		rc = -1;
+		syslog(LOG_CRIT,"set_efidp_header 2");
 		goto out;
 	}
 	if (req <= 4) { /* if we just have an end device path,
 			  it's not going to work. */
 		rc = EINVAL;
+		syslog(LOG_CRIT,"set_efidp_header 3");
 		goto out;
 	}
 
 	dp_buf = calloc(1, req);
 	if (!dp_buf) {
 		rc = -1;
+		syslog(LOG_CRIT,"set_efidp_header 4");
 		goto out;
 	}
 
@@ -1180,6 +1185,7 @@ set_efidp_header(update_info *info, const char *path)
 				EFIBOOT_ABBREV_HD);
 	if (sz < 0) {
 		rc = -1;
+		syslog(LOG_CRIT,"set_efidp_header 5");
 		goto out;
 	}
 
@@ -1190,6 +1196,7 @@ set_efidp_header(update_info *info, const char *path)
 	dp_buf = NULL;
 out:
 	free(dp_buf);
+	syslog(LOG_CRIT,"set_efidp_header out");
 	return rc;
 }
 
@@ -1386,6 +1393,7 @@ fwup_set_up_update_with_buf(fwup_resource *re,
 	printf("fwup_set_up_update_with_buf 4");
 	syslog(LOG_CRIT,"fwup_set_up_update_with_buf 4");
 	system("echo fwup_set_up_update_with_buf 4 >> /tmp/aa");
+	syslog(LOG_CRIT,"fwup_set_up_update_with_buf 4.1");
 
 	/* write the buf to a new file */
 	while (sz-off) {
@@ -1397,13 +1405,18 @@ fwup_set_up_update_with_buf(fwup_resource *re,
 		if (wsz < 0) {
 			rc = wsz;
 			efi_error("write failed");
+			syslog(LOG_CRIT,"fwup_set_up_update_with_buf 4.2");
 			goto out;
 		}
 		off += wsz;
 	}
+	
+	syslog(LOG_CRIT,"fwup_set_up_update_with_buf 4.3");
 
 	/* set efidp header */
 	rc = set_efidp_header(info, path);
+	
+	syslog(LOG_CRIT,"fwup_set_up_update_with_buf 4.4");
 	if (rc < 0)
 		goto out;
 
