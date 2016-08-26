@@ -29,7 +29,7 @@ i/*
 #include "ucs2.h"
 #include "fwup-efi.h"
 
-static int verbose=2;
+static int verbose;
 #include "error.h"
 
 #ifdef FWUPDATE_HAVE_LIBSMBIOS__
