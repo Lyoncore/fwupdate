@@ -21,6 +21,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <syslog.h>
 
 #define EFI_TIME efi_time_t
 
