@@ -1161,7 +1161,7 @@ set_efidp_header(update_info *info, const char *path)
 				EFIBOOT_ABBREV_HD);
 	if (req < 0) {
 		rc = -1;
-		syslog(LOG_CRIT,"set_efidp_header 2");
+		syslog(LOG_CRIT,"set_efidp_header 2: %s", path);
 		goto out;
 	}
 	if (req <= 4) { /* if we just have an end device path,
