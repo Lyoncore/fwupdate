@@ -779,6 +779,8 @@ set_up_boot_next(void)
 	uint8_t *opt=NULL;
 	ssize_t opt_size=0;
 	uint32_t attributes = LOAD_OPTION_ACTIVE;
+	
+	printf("set_up_boot_next 1");
 
 	rc = get_paths(&shim_fs_path, &fwup_fs_path, &fwup_esp_path);
 	if (rc < 0) {
@@ -789,6 +791,8 @@ set_up_boot_next(void)
 	if (!shim_fs_path)
 		use_fwup_path = 1;
 
+	printf("set_up_boot_next 2");
+
 	sz = efi_generate_file_device_path(dp_buf, dp_size, use_fwup_path
 							    ? fwup_fs_path
 							    : shim_fs_path,
@@ -798,6 +802,8 @@ set_up_boot_next(void)
 		efi_error("efi_generate_file_device_path() failed");
 		goto out;
 	}
+
+	printf("set_up_boot_next 3");
 
 	dp_size=sz;
 	dp_buf = calloc(1, dp_size);
@@ -813,6 +819,8 @@ set_up_boot_next(void)
 			loader_sz += 2;
 		loader_str = onstack(loader_str, loader_sz);
 	}
+	
+	printf("set_up_boot_next 4");
 
 	sz = efi_generate_file_device_path(dp_buf, dp_size, use_fwup_path
 							    ? fwup_fs_path
@@ -829,6 +837,8 @@ set_up_boot_next(void)
 		efi_error("asprintf() failed");
 		goto out;
 	}
+
+	printf("set_up_boot_next 5");
 
 	sz = efi_loadopt_create(opt, opt_size, attributes,
 				  (efidp)dp_buf, dp_size,
@@ -852,6 +862,8 @@ set_up_boot_next(void)
 		efi_error("loadopt size was unreasonable.");
 		goto out;
 	}
+
+	printf("set_up_boot_next 6");
 
 	int set_entries[0x10000 / sizeof(int)] = {0,};
 	efi_guid_t *guid = NULL;
