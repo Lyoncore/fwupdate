@@ -1356,9 +1356,7 @@ fwup_set_up_update_with_buf(fwup_resource *re,
 	int error;
 	off_t off = 0;
 
-        printf("fwup_set_up_update_with_buf");
         syslog(LOG_CRIT,"fwup_set_up_update_with_buf");
-        system("echo fwup_set_up_update_with_buf > /tmp/aa");
 
 	/* check parameters */
 	if (buf == NULL || sz == 0) {
@@ -1367,9 +1365,7 @@ fwup_set_up_update_with_buf(fwup_resource *re,
 		goto out;
 	}
 	
-	printf("fwup_set_up_update_with_buf 2");
         syslog(LOG_CRIT,"fwup_set_up_update_with_buf 2");
-        system("echo fwup_set_up_update_with_buf 2 >> /tmp/aa");
 
 
 	/* get device */
@@ -1379,9 +1375,7 @@ fwup_set_up_update_with_buf(fwup_resource *re,
 		goto out;
 	}
 
-	printf("fwup_set_up_update_with_buf 3");
 	syslog(LOG_CRIT,"fwup_set_up_update_with_buf 3");
-	system("echo fwup_set_up_update_with_buf 3 >> /tmp/aa");
 
 	/* get destination */
 	fd = get_fd_and_media_path(info, &path);
@@ -1390,10 +1384,7 @@ fwup_set_up_update_with_buf(fwup_resource *re,
 		goto out;
 	}
 	
-	printf("fwup_set_up_update_with_buf 4");
 	syslog(LOG_CRIT,"fwup_set_up_update_with_buf 4");
-	system("echo fwup_set_up_update_with_buf 4 >> /tmp/aa");
-	syslog(LOG_CRIT,"fwup_set_up_update_with_buf 4.1");
 
 	/* write the buf to a new file */
 	while (sz-off) {
@@ -1412,9 +1403,11 @@ fwup_set_up_update_with_buf(fwup_resource *re,
 	}
 	
 	syslog(LOG_CRIT,"fwup_set_up_update_with_buf 4.3");
+	fwup_print_update_info();
 
 	/* set efidp header */
 	rc = set_efidp_header(info, path);
+	fwup_print_update_info();
 	
 	syslog(LOG_CRIT,"fwup_set_up_update_with_buf 4.4");
 	if (rc < 0)
@@ -1555,12 +1548,12 @@ fwup_print_update_info(void)
 			break;
 		}
 
-		printf("\nInformation for the update status entry %d:\n", id++);
-		printf("  Information Version: %d\n", info->update_info_version);
-		printf("  Firmware GUID: %s\n", id_guid);
-		printf("  Capsule Flags: 0x%08x\n", info->capsule_flags);
-		printf("  Hardware Instance: %" PRIu64 "\n", info->hw_inst);
-		printf("  Update Status: %s\n",
+		syslog(LOG_CRIT,"\nInformation for the update status entry %d:\n", id++);
+		syslog(LOG_CRIT,"  Information Version: %d\n", info->update_info_version);
+		syslog(LOG_CRIT,"  Firmware GUID: %s\n", id_guid);
+		syslog(LOG_CRIT,"  Capsule Flags: 0x%08x\n", info->capsule_flags);
+		syslog(LOG_CRIT,"  Hardware Instance: %" PRIu64 "\n", info->hw_inst);
+		syslog(LOG_CRIT,"  Update Status: %s\n",
 		       info->status == FWUPDATE_ATTEMPT_UPDATE ? "Preparing"
 		       : info->status == FWUPDATE_ATTEMPTED ? "Attempted"
 		       : "Unknown");
@@ -1577,13 +1570,13 @@ fwup_print_update_info(void)
 			tm.tm_sec = time_attempted->second;
 			tm.tm_isdst = time_attempted->daylight;
 
-			printf("  Attempted Time: ");
+			syslog(LOG_CRIT,"  Attempted Time: ");
 			if (mktime(&tm) != (time_t)-1)
-				printf("%s", asctime(&tm));
+				syslog(LOG_CRIT,"%s", asctime(&tm));
 			else
-				printf("Unknown\n");
+				syslog(LOG_CRIT,"Unknown\n");
 		}
-		printf("  Capsule File Path: %s\n", path);
+		syslog(LOG_CRIT,"  Capsule File Path: %s\n", path);
 
 		free(path);
 		free(id_guid);
