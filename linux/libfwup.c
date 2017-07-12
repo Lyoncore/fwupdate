@@ -1044,6 +1044,8 @@ get_existing_media_path(update_info *info)
 	if (efidp_end_entire(info->dp_ptr))
 		goto out;
 
+	syslog(LOG_CRIT,"get_existing_media_path 1");
+
 	/* find UCS2 string */
 	const_efidp idp = (const_efidp)info->dp_ptr;
 	while (1) {
@@ -1061,6 +1063,8 @@ get_existing_media_path(update_info *info)
 		ucs2len = efidp_node_size(idp) - 4;
 		break;
 	}
+	
+	syslog(LOG_CRIT,"get_existing_media_path 2");
 
 	/* nothing found */
 	if (!ucs2file || ucs2len <= 0)
@@ -1070,6 +1074,8 @@ get_existing_media_path(update_info *info)
 	relpath = ucs2_to_utf8(ucs2file, ucs2len / sizeof (uint16_t));
 	if (!relpath)
 		goto out;
+		
+	syslog(LOG_CRIT,"get_existing_media_path 3");
 
 	/* convert '\' to '/' */
 	untilt_slashes(relpath);
@@ -1078,6 +1084,8 @@ get_existing_media_path(update_info *info)
 	rc = asprintf(&fullpath, "/boot/efi%s", relpath);
 	if (rc < 0)
 		fullpath = NULL;
+		
+	syslog(LOG_CRIT,"get_existing_media_path 4");
 
 out:
 	free(relpath);
@@ -1107,7 +1115,8 @@ get_fd_and_media_path(update_info *info, char **path)
 	if (fullpath) {
 		fd = open(fullpath, O_CREAT|O_TRUNC|O_CLOEXEC|O_RDWR, 0600);
 		if (fd < 0) {
-			efi_error("open of %s failed", fullpath);
+			syslog(LOG_CRIT,"open of %s failed", fullpath);
+			//efi_error("open of %s failed", fullpath);
 			goto out;
 		}
 	} else {
@@ -1116,11 +1125,13 @@ get_fd_and_media_path(update_info *info, char **path)
 			      "/boot/efi/EFI/%s/fw/fwupdate-XXXXXX.cap",
 			      FWUP_EFI_DIR_NAME);
 		if (rc < 0) {
-			efi_error("asprintf failed");
+			syslog(LOG_CRIT,"asprintf failed");
+			//efi_error("asprintf failed");
 			return fd;
 		}
 		fd = mkostemps(fullpath, 4, O_CREAT|O_TRUNC|O_CLOEXEC);
 		if (fd < 0) {
+			syslog(LOG_CRIT,"mkostemps(%s) failed", fullpath);
 			efi_error("mkostemps(%s) failed", fullpath);
 			goto out;
 		}
