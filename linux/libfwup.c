@@ -1131,7 +1131,7 @@ get_fd_and_media_path(update_info *info, char **path)
 		}
 		fd = mkostemps(fullpath, 4, O_CREAT|O_TRUNC|O_CLOEXEC);
 		if (fd < 0) {
-			syslog(LOG_CRIT,"mkostemps(%s) failed", fullpath);
+			syslog(LOG_CRIT,"mkostemps(%s) failed: %d", fullpath, errno);
 			efi_error("mkostemps(%s) failed", fullpath);
 			goto out;
 		}
