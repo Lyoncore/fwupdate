@@ -1189,7 +1189,7 @@ set_efidp_header(update_info *info, const char *path)
 		goto out;
 	}
 
-	syslog(LOG_CRIT,"libfwup: set_efidp_header 4.1: %l and %s",req,path);
+	syslog(LOG_CRIT,"libfwup: set_efidp_header 4.1: %ld and %s",req,path);
 
 	/* actually get the path this time */
 	efidp_header *dp = (efidp_header *)dp_buf;
