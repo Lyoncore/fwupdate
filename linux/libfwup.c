@@ -1201,6 +1201,8 @@ set_efidp_header(update_info *info, const char *path)
 		syslog(LOG_CRIT,"libfwup: set_efidp_header 5");
 		goto out;
 	}
+	
+	syslog(LOG_CRIT,"libfwup: set_efidp_header 6");
 
 	/* @info owns this now */
 	if (info->dp_ptr)
