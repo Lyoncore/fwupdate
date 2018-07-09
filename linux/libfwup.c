@@ -181,7 +181,7 @@ fwup_supported(void)
 	int rc;
 	
 	printf("fwup_supported");
-	syslog(LOG_CRIT,"fwup_supported");
+	syslog(LOG_CRIT,"libfwup: fwup_supported");
 
 	rc = stat(get_esrt_dir(1), &buf);
 	if (rc < 0)
@@ -784,7 +784,7 @@ set_up_boot_next(void)
 	ssize_t opt_size=0;
 	uint32_t attributes = LOAD_OPTION_ACTIVE;
 	
-	syslog(LOG_CRIT,"set_up_boot_next 1");
+	syslog(LOG_CRIT,"libfwup: set_up_boot_next 1");
 
 	rc = get_paths(&shim_fs_path, &fwup_fs_path, &fwup_esp_path);
 	if (rc < 0) {
@@ -795,7 +795,7 @@ set_up_boot_next(void)
 	if (!shim_fs_path)
 		use_fwup_path = 1;
 
-	syslog(LOG_CRIT,"set_up_boot_next 2");
+	syslog(LOG_CRIT,"libfwup: set_up_boot_next 2");
 
 	sz = efi_generate_file_device_path(dp_buf, dp_size, use_fwup_path
 							    ? fwup_fs_path
@@ -807,7 +807,7 @@ set_up_boot_next(void)
 		goto out;
 	}
 
-	syslog(LOG_CRIT,"set_up_boot_next 3");
+	syslog(LOG_CRIT,"libfwup: set_up_boot_next 3");
 
 	dp_size=sz;
 	dp_buf = calloc(1, dp_size);
@@ -824,7 +824,7 @@ set_up_boot_next(void)
 		loader_str = onstack(loader_str, loader_sz);
 	}
 	
-	syslog(LOG_CRIT,"set_up_boot_next 4");
+	syslog(LOG_CRIT,"libfwup: set_up_boot_next 4");
 
 	sz = efi_generate_file_device_path(dp_buf, dp_size, use_fwup_path
 							    ? fwup_fs_path
@@ -842,7 +842,7 @@ set_up_boot_next(void)
 		goto out;
 	}
 
-	syslog(LOG_CRIT,"set_up_boot_next 5");
+	syslog(LOG_CRIT,"libfwup: set_up_boot_next 5");
 
 	sz = efi_loadopt_create(opt, opt_size, attributes,
 				  (efidp)dp_buf, dp_size,
@@ -867,7 +867,7 @@ set_up_boot_next(void)
 		goto out;
 	}
 
-	syslog(LOG_CRIT,"set_up_boot_next 6");
+	syslog(LOG_CRIT,"libfwup: set_up_boot_next 6");
 
 	int set_entries[0x10000 / sizeof(int)] = {0,};
 	efi_guid_t *guid = NULL;
@@ -1044,7 +1044,7 @@ get_existing_media_path(update_info *info)
 	if (efidp_end_entire(info->dp_ptr))
 		goto out;
 
-	syslog(LOG_CRIT,"get_existing_media_path 1");
+	syslog(LOG_CRIT,"libfwup: get_existing_media_path 1");
 
 	/* find UCS2 string */
 	const_efidp idp = (const_efidp)info->dp_ptr;
@@ -1064,7 +1064,7 @@ get_existing_media_path(update_info *info)
 		break;
 	}
 	
-	syslog(LOG_CRIT,"get_existing_media_path 2");
+	syslog(LOG_CRIT,"libfwup: get_existing_media_path 2");
 
 	/* nothing found */
 	if (!ucs2file || ucs2len <= 0)
@@ -1075,7 +1075,7 @@ get_existing_media_path(update_info *info)
 	if (!relpath)
 		goto out;
 		
-	syslog(LOG_CRIT,"get_existing_media_path 3");
+	syslog(LOG_CRIT,"libfwup: get_existing_media_path 3");
 
 	/* convert '\' to '/' */
 	untilt_slashes(relpath);
@@ -1085,7 +1085,7 @@ get_existing_media_path(update_info *info)
 	if (rc < 0)
 		fullpath = NULL;
 		
-	syslog(LOG_CRIT,"get_existing_media_path 4");
+	syslog(LOG_CRIT,"libfwup: get_existing_media_path 4");
 
 out:
 	free(relpath);
@@ -1115,7 +1115,7 @@ get_fd_and_media_path(update_info *info, char **path)
 	if (fullpath) {
 		fd = open(fullpath, O_CREAT|O_TRUNC|O_CLOEXEC|O_RDWR, 0600);
 		if (fd < 0) {
-			syslog(LOG_CRIT,"open of %s failed", fullpath);
+			syslog(LOG_CRIT,"libfwup: open of %s failed", fullpath);
 			//efi_error("open of %s failed", fullpath);
 			goto out;
 		}
@@ -1125,13 +1125,13 @@ get_fd_and_media_path(update_info *info, char **path)
 			      "/boot/efi/EFI/%s/fw/fwupdate-XXXXXX.cap",
 			      FWUP_EFI_DIR_NAME);
 		if (rc < 0) {
-			syslog(LOG_CRIT,"asprintf failed");
+			syslog(LOG_CRIT,"libfwup: asprintf failed");
 			//efi_error("asprintf failed");
 			return fd;
 		}
 		fd = mkostemps(fullpath, 4, O_CREAT|O_TRUNC|O_CLOEXEC);
 		if (fd < 0) {
-			syslog(LOG_CRIT,"mkostemps(%s) failed: %d", fullpath, errno);
+			syslog(LOG_CRIT,"libfwup: mkostemps(%s) failed: %d", fullpath, errno);
 			efi_error("mkostemps(%s) failed", fullpath);
 			goto out;
 		}
@@ -1164,7 +1164,7 @@ set_efidp_header(update_info *info, const char *path)
 	ssize_t sz;
 	uint8_t *dp_buf = NULL;
 
-	syslog(LOG_CRIT,"set_efidp_header 1");
+	syslog(LOG_CRIT,"libfwup: set_efidp_header 1: %s", path);
 
 	/* get the size of the path first */
 	req = efi_generate_file_device_path(NULL, 0, path,
@@ -1172,22 +1172,24 @@ set_efidp_header(update_info *info, const char *path)
 				EFIBOOT_ABBREV_HD);
 	if (req < 0) {
 		rc = -1;
-		syslog(LOG_CRIT,"set_efidp_header 2: %s", path);
+		syslog(LOG_CRIT,"libfwup: set_efidp_header 2: %s", path);
 		goto out;
 	}
 	if (req <= 4) { /* if we just have an end device path,
 			  it's not going to work. */
 		rc = EINVAL;
-		syslog(LOG_CRIT,"set_efidp_header 3");
+		syslog(LOG_CRIT,"libfwup: set_efidp_header 3");
 		goto out;
 	}
 
 	dp_buf = calloc(1, req);
 	if (!dp_buf) {
 		rc = -1;
-		syslog(LOG_CRIT,"set_efidp_header 4");
+		syslog(LOG_CRIT,"libfwup: set_efidp_header 4");
 		goto out;
 	}
+
+	syslog(LOG_CRIT,"libfwup: set_efidp_header 4.1: %d,%s",req,path);
 
 	/* actually get the path this time */
 	efidp_header *dp = (efidp_header *)dp_buf;
@@ -1196,7 +1198,7 @@ set_efidp_header(update_info *info, const char *path)
 				EFIBOOT_ABBREV_HD);
 	if (sz < 0) {
 		rc = -1;
-		syslog(LOG_CRIT,"set_efidp_header 5");
+		syslog(LOG_CRIT,"libfwup: set_efidp_header 5");
 		goto out;
 	}
 
@@ -1207,7 +1209,7 @@ set_efidp_header(update_info *info, const char *path)
 	dp_buf = NULL;
 out:
 	free(dp_buf);
-	syslog(LOG_CRIT,"set_efidp_header out");
+	syslog(LOG_CRIT,"libfwup: set_efidp_header out");
 	return rc;
 }
 
@@ -1367,7 +1369,7 @@ fwup_set_up_update_with_buf(fwup_resource *re,
 	int error;
 	off_t off = 0;
 
-        syslog(LOG_CRIT,"fwup_set_up_update_with_buf");
+        syslog(LOG_CRIT,"libfwup: fwup_set_up_update_with_buf");
 
 	/* check parameters */
 	if (buf == NULL || sz == 0) {
@@ -1376,7 +1378,7 @@ fwup_set_up_update_with_buf(fwup_resource *re,
 		goto out;
 	}
 	
-        syslog(LOG_CRIT,"fwup_set_up_update_with_buf 2");
+        syslog(LOG_CRIT,"libfwup: fwup_set_up_update_with_buf 2");
 
 
 	/* get device */
@@ -1386,7 +1388,7 @@ fwup_set_up_update_with_buf(fwup_resource *re,
 		goto out;
 	}
 
-	syslog(LOG_CRIT,"fwup_set_up_update_with_buf 3");
+	syslog(LOG_CRIT,"libfwup: fwup_set_up_update_with_buf 3");
 
 	/* get destination */
 	fd = get_fd_and_media_path(info, &path);
@@ -1395,7 +1397,7 @@ fwup_set_up_update_with_buf(fwup_resource *re,
 		goto out;
 	}
 	
-	syslog(LOG_CRIT,"fwup_set_up_update_with_buf 4");
+	syslog(LOG_CRIT,"libfwup: fwup_set_up_update_with_buf 4");
 
 	/* write the buf to a new file */
 	while (sz-off) {
@@ -1407,24 +1409,24 @@ fwup_set_up_update_with_buf(fwup_resource *re,
 		if (wsz < 0) {
 			rc = wsz;
 			efi_error("write failed");
-			syslog(LOG_CRIT,"fwup_set_up_update_with_buf 4.2");
+			syslog(LOG_CRIT,"libfwup: fwup_set_up_update_with_buf 4.2");
 			goto out;
 		}
 		off += wsz;
 	}
 	
-	syslog(LOG_CRIT,"fwup_set_up_update_with_buf 4.3");
+	syslog(LOG_CRIT,"libfwup: fwup_set_up_update_with_buf 4.3");
 	fwup_print_update_info();
 
 	/* set efidp header */
 	rc = set_efidp_header(info, path);
 	fwup_print_update_info();
 	
-	syslog(LOG_CRIT,"fwup_set_up_update_with_buf 4.4");
+	syslog(LOG_CRIT,"libfwup: fwup_set_up_update_with_buf 4.4");
 	if (rc < 0)
 		goto out;
 
-	syslog(LOG_CRIT,"fwup_set_up_update_with_buf 5");
+	syslog(LOG_CRIT,"libfwup: fwup_set_up_update_with_buf 5");
 
 	/* save this to the hardware */
 	info->status = FWUPDATE_ATTEMPT_UPDATE;
@@ -1436,13 +1438,13 @@ fwup_set_up_update_with_buf(fwup_resource *re,
 		goto out;
 	}
 
-	syslog(LOG_CRIT,"fwup_set_up_update_with_buf 6");
+	syslog(LOG_CRIT,"libfwup: fwup_set_up_update_with_buf 6");
 	/* update the firmware before the bootloader runs */
 	rc = set_up_boot_next();
 	if (rc < 0)
 		goto out;
 	
-	syslog(LOG_CRIT,"fwup_set_up_update_with_buf 7");	
+	syslog(LOG_CRIT,"libfwup: fwup_set_up_update_with_buf 7");	
 	
 out:
 	error = errno;
@@ -1451,7 +1453,7 @@ out:
 		close(fd);
 	errno = error;
 	
-	syslog(LOG_CRIT,"fwup_set_up_update_with_buf out");
+	syslog(LOG_CRIT,"libfwup: fwup_set_up_update_with_buf out");
 	
 	return rc;
 }
@@ -1551,12 +1553,12 @@ fwup_print_update_info(void)
 			break;
 		}
 
-		syslog(LOG_CRIT,"\nInformation for the update status entry %d:\n", id++);
-		syslog(LOG_CRIT,"  Information Version: %d\n", info->update_info_version);
-		syslog(LOG_CRIT,"  Firmware GUID: %s\n", id_guid);
-		syslog(LOG_CRIT,"  Capsule Flags: 0x%08x\n", info->capsule_flags);
-		syslog(LOG_CRIT,"  Hardware Instance: %" PRIu64 "\n", info->hw_inst);
-		syslog(LOG_CRIT,"  Update Status: %s\n",
+		syslog(LOG_CRIT,"libfwup: \nInformation for the update status entry %d:\n", id++);
+		syslog(LOG_CRIT,"libfwup:   Information Version: %d\n", info->update_info_version);
+		syslog(LOG_CRIT,"libfwup:   Firmware GUID: %s\n", id_guid);
+		syslog(LOG_CRIT,"libfwup:   Capsule Flags: 0x%08x\n", info->capsule_flags);
+		syslog(LOG_CRIT,"libfwup:   Hardware Instance: %" PRIu64 "\n", info->hw_inst);
+		syslog(LOG_CRIT,"libfwup:   Update Status: %s\n",
 		       info->status == FWUPDATE_ATTEMPT_UPDATE ? "Preparing"
 		       : info->status == FWUPDATE_ATTEMPTED ? "Attempted"
 		       : "Unknown");
@@ -1573,13 +1575,13 @@ fwup_print_update_info(void)
 			tm.tm_sec = time_attempted->second;
 			tm.tm_isdst = time_attempted->daylight;
 
-			syslog(LOG_CRIT,"  Attempted Time: ");
+			syslog(LOG_CRIT,"libfwup:   Attempted Time: ");
 			if (mktime(&tm) != (time_t)-1)
-				syslog(LOG_CRIT,"%s", asctime(&tm));
+				syslog(LOG_CRIT,"libfwup: %s", asctime(&tm));
 			else
-				syslog(LOG_CRIT,"Unknown\n");
+				syslog(LOG_CRIT,"libfwup: Unknown\n");
 		}
-		syslog(LOG_CRIT,"  Capsule File Path: %s\n", path);
+		syslog(LOG_CRIT,"libfwup:   Capsule File Path: %s\n", path);
 
 		free(path);
 		free(id_guid);
