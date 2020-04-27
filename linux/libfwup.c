@@ -1107,10 +1107,12 @@ get_fd_and_media_path(update_info *info, char **path)
 	 * update GUID, and reuse the filename so we don't wind up
 	 * littering the filesystem with old updates */
 	fullpath = get_existing_media_path (info);
+	printf("[debug] (%s,%s,%d) fullpath:%s\n", __FILE__, __func__, __LINE__, fullpath);
 	if (fullpath) {
 		fd = open(fullpath, O_CREAT|O_TRUNC|O_CLOEXEC|O_RDWR, 0600);
 		if (fd < 0) {
 			efi_error("open of %s failed", fullpath);
+			printf("[debug] (%s,%s,%d) open of %s failed\n", __FILE__, __func__, __LINE__, fullpath);
 			goto out;
 		}
 	} else {
@@ -1120,11 +1122,13 @@ get_fd_and_media_path(update_info *info, char **path)
 			      FWUP_EFI_DIR_NAME);
 		if (rc < 0) {
 			efi_error("asprintf failed");
+			printf("[debug] (%s,%s,%d) asprintf failed:%d\n", __FILE__, __func__, __LINE__, rc);
 			return fd;
 		}
 		fd = mkostemps(fullpath, 4, O_CREAT|O_TRUNC|O_CLOEXEC);
 		if (fd < 0) {
 			efi_error("mkostemps(%s) failed", fullpath);
+			printf("[debug] (%s,%s,%d) mkostemps(%s) failed\n", __FILE__, __func__, __LINE__, fullpath);
 			goto out;
 		}
 	}
