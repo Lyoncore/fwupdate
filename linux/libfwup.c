@@ -783,6 +783,7 @@ set_up_boot_next(void)
 	rc = get_paths(&shim_fs_path, &fwup_fs_path, &fwup_esp_path);
 	if (rc < 0) {
 		efi_error("could not find paths for shim and fwup");
+		printf("[debug] (%s,%s,%d) get_paths:%d\n", __FILE__, __func__, __LINE__, rc);
 		return -1;
 	}
 
@@ -796,6 +797,7 @@ set_up_boot_next(void)
 					   EFIBOOT_ABBREV_HD);
 	if (sz < 0) {
 		efi_error("efi_generate_file_device_path() failed");
+		printf("[debug] (%s,%s,%d) efi_generate_file_device_path:%zd\n", __FILE__, __func__, __LINE__, sz);
 		goto out;
 	}
 
@@ -803,6 +805,7 @@ set_up_boot_next(void)
 	dp_buf = calloc(1, dp_size);
 	if (!dp_buf) {
 		efi_error("calloc(1, %zd) failed", dp_size);
+		printf("[debug] (%s,%s,%d) calloc(1, %zd) failed\n", __FILE__, __func__, __LINE__, dp_size);
 		goto out;
 	}
 
@@ -821,6 +824,7 @@ set_up_boot_next(void)
 					   EFIBOOT_ABBREV_HD);
 	if (sz != dp_size) {
 		efi_error("efi_generate_file_device_path() failed");
+		printf("[debug] (%s,%s,%d) efi_generate_file_device_path() failed\n", __FILE__, __func__, __LINE__);
 		goto out;
 	}
 
@@ -836,11 +840,13 @@ set_up_boot_next(void)
 				  (uint8_t *)loader_str, loader_sz);
 	if (sz < 0) {
 		efi_error("efi_loadopt_create() failed");
+		printf("[debug] (%s,%s,%d) efi_loadopt_create() failed\n", __FILE__, __func__, __LINE__);
 		goto out;
 	}
 	opt = calloc(1, sz);
 	if (!opt) {
 		efi_error("calloc(1, %zd) failed", sz);
+		printf("[debug] (%s,%s,%d) calloc(1, %zd) failed\n", __FILE__, __func__, __LINE__, sz);
 		goto out;
 	}
 	opt_size = sz;
@@ -850,6 +856,7 @@ set_up_boot_next(void)
 				  (uint8_t *)loader_str, loader_sz);
 	if (sz != opt_size) {
 		efi_error("loadopt size was unreasonable.");
+		printf("[debug] (%s,%s,%d) loadopt size was unreasonable.\n", __FILE__, __func__, __LINE__);
 		goto out;
 	}
 
@@ -889,12 +896,14 @@ set_up_boot_next(void)
 				      &attr);
 		if (rc < 0) {
 			efi_error("efi_get_variable() failed");
+			printf("[debug] (%s,%s,%d) efi_get_variable() failed\n", __FILE__, __func__, __LINE__);
 			continue;
 		}
 
 		loadopt = (efi_load_option *)var_data;
 		if (!efi_loadopt_is_valid(loadopt, var_data_size)) {
 			efi_error("load option was invalid");
+			printf("[debug] (%s,%s,%d) load option was invalid\n", __FILE__, __func__, __LINE__);
 do_next:
 			free(var_data);
 			continue;
@@ -903,22 +912,26 @@ do_next:
 		sz = efi_loadopt_pathlen(loadopt, var_data_size);
 		if (sz != efidp_size((efidp)dp_buf)) {
 			efi_error("device path doesn't match");
+			printf("[debug] (%s,%s,%d) device path doesn't match\n", __FILE__, __func__, __LINE__);
 			goto do_next;
 		}
 
 		efidp found_dp = efi_loadopt_path(loadopt, var_data_size);
 		if (memcmp(found_dp, dp_buf, sz)) {
 			efi_error("device path doesn't match");
+			printf("[debug] (%s,%s,%d) device path doesn't match\n", __FILE__, __func__, __LINE__);
 			goto do_next;
 		}
 
 		if ((ssize_t)var_data_size != opt_size) {
 			efi_error("variable data doesn't match");
+			printf("[debug] (%s,%s,%d) variable data doesn't match\n", __FILE__, __func__, __LINE__);
 			goto do_next;
 		}
 
 		if (memcmp(loadopt, opt, opt_size)) {
 			efi_error("load option doesn't match");
+			printf("[debug] (%s,%s,%d) load option doesn't match\n", __FILE__, __func__, __LINE__);
 			goto do_next;
 		}
 
@@ -929,6 +942,7 @@ do_next:
 	}
 	if (rc < 0) {
 		efi_error("failed to find boot variable");
+		printf("[debug] (%s,%s,%d) failed to find boot variable\n", __FILE__, __func__, __LINE__);
 		goto out;
 	}
 
@@ -939,6 +953,7 @@ do_next:
 		free(var_data);
 		if (rc < 0) {
 			efi_error("could not set boot variable active");
+			printf("[debug] (%s,%s,%d) could not set boot variable active\n", __FILE__, __func__, __LINE__);
 			goto out;
 		}
 	} else {
@@ -956,6 +971,7 @@ do_next:
 
 		if (boot_next >= 0x10000) {
 			efi_error("no free boot variables!");
+			printf("[debug] (%s,%s,%d) no free boot variables\n", __FILE__, __func__, __LINE__);
 			goto out;
 		}
 
@@ -968,6 +984,7 @@ do_next:
 				      0600);
 		if (rc < 0) {
 			efi_error("could not set boot variable");
+			printf("[debug] (%s,%s,%d) could not set boot variable\n", __FILE__, __func__, __LINE__);
 			goto out;
 		}
 	}
@@ -979,8 +996,10 @@ do_next:
 			      EFI_VARIABLE_BOOTSERVICE_ACCESS |
 			      EFI_VARIABLE_RUNTIME_ACCESS,
 			      0600);
-	if (rc < 0)
+	if (rc < 0) {
 		efi_error("could not set BootNext");
+		printf("[debug] (%s,%s,%d) could not set BootNext\n", __FILE__, __func__, __LINE__);
+	}
 	else
 		efi_error_clear();
 	ret = rc;
@@ -1336,6 +1355,7 @@ fwup_set_up_update_with_buf(fwup_resource *re,
 	/* check parameters */
 	if (buf == NULL || sz == 0) {
 		efi_error("buf invalid.");
+		printf("[debug] (%s,%s,%d) %s\n", __FILE__, __func__, __LINE__, "buf invalid.\n");
 		rc = -1;
 		goto out;
 	}
@@ -1344,6 +1364,7 @@ fwup_set_up_update_with_buf(fwup_resource *re,
 	rc = get_info(&re->esre.guid, 0, &info);
 	if (rc < 0) {
 		efi_error("get_info failed.");
+		printf("[debug] (%s,%s,%d) %s\n", __FILE__, __func__, __LINE__, "get_info failed.\n");
 		goto out;
 	}
 
@@ -1351,6 +1372,7 @@ fwup_set_up_update_with_buf(fwup_resource *re,
 	fd = get_fd_and_media_path(info, &path);
 	if (fd < 0) {
 		rc = -1;
+		printf("[debug] (%s,%s,%d) get_fd_and_media_path:%d\n", __FILE__, __func__, __LINE__, fd);
 		goto out;
 	}
 
@@ -1364,6 +1386,7 @@ fwup_set_up_update_with_buf(fwup_resource *re,
 		if (wsz < 0) {
 			rc = wsz;
 			efi_error("write failed");
+			printf("[debug] (%s,%s,%d) %s\n", __FILE__, __func__, __LINE__, "write failed.\n");
 			goto out;
 		}
 		off += wsz;
@@ -1371,8 +1394,10 @@ fwup_set_up_update_with_buf(fwup_resource *re,
 
 	/* set efidp header */
 	rc = set_efidp_header(info, path);
-	if (rc < 0)
+	if (rc < 0) {
+		printf("[debug] (%s,%s,%d) set_efidp_header:%d\n", __FILE__, __func__, __LINE__, rc);
 		goto out;
+	}
 
 	/* save this to the hardware */
 	info->status = FWUPDATE_ATTEMPT_UPDATE;
@@ -1381,13 +1406,16 @@ fwup_set_up_update_with_buf(fwup_resource *re,
 	rc = put_info(info);
 	if (rc < 0) {
 		efi_error("put_info failed.");
+		printf("[debug] (%s,%s,%d) %s\n", __FILE__, __func__, __LINE__, "put_info failed.\n");
 		goto out;
 	}
 
 	/* update the firmware before the bootloader runs */
 	rc = set_up_boot_next();
-	if (rc < 0)
+	if (rc < 0) {
+		printf("[debug] (%s,%s,%d) set_up_boot_next:%d\n", __FILE__, __func__, __LINE__, rc);
 		goto out;
+	}
 out:
 	error = errno;
 	free_info(info);
