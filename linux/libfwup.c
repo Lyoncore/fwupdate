@@ -1112,7 +1112,7 @@ get_fd_and_media_path(update_info *info, char **path)
 		fd = open(fullpath, O_CREAT|O_TRUNC|O_CLOEXEC|O_RDWR, 0600);
 		if (fd < 0) {
 			efi_error("open of %s failed", fullpath);
-			printf("[debug] (%s,%s,%d) open of %s failed\n", __FILE__, __func__, __LINE__, fullpath);
+			printf("[debug] (%s,%s,%d) open of %s failed: %s\n", __FILE__, __func__, __LINE__, fullpath, strerror(errno));
 			goto out;
 		}
 	} else {
