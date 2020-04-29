@@ -1108,6 +1108,39 @@ get_fd_and_media_path(update_info *info, char **path)
 	 * littering the filesystem with old updates */
 	fullpath = get_existing_media_path (info);
 	printf("[debug] (%s,%s,%d) fullpath:%s\n", __FILE__, __func__, __LINE__, fullpath);
+	const char* folder = "/boot/efi/EFI/ubuntu/fw";
+	struct stat sb;
+
+	if (stat(folder, &sb) == 0 && S_ISDIR(sb.st_mode)) {
+		printf("[debug] (%s,%s,%d) open %s ok\n", __FILE__, __func__, __LINE__, folder);
+	} else {
+		printf("[debug] (%s,%s,%d) open of %s failed: %s\n", __FILE__, __func__, __LINE__, folder, strerror(errno));
+	}
+	folder = "/boot/efi/EFI/ubuntu";
+	if (stat(folder, &sb) == 0 && S_ISDIR(sb.st_mode)) {
+		printf("[debug] (%s,%s,%d) open %s ok\n", __FILE__, __func__, __LINE__, folder);
+	} else {
+		printf("[debug] (%s,%s,%d) open of %s failed: %s\n", __FILE__, __func__, __LINE__, folder, strerror(errno));
+	}
+	folder = "/boot/efi/EFI";
+	if (stat(folder, &sb) == 0 && S_ISDIR(sb.st_mode)) {
+		printf("[debug] (%s,%s,%d) open %s ok\n", __FILE__, __func__, __LINE__, folder);
+	} else {
+		printf("[debug] (%s,%s,%d) open of %s failed: %s\n", __FILE__, __func__, __LINE__, folder, strerror(errno));
+	}
+	folder = "/boot/efi";
+	if (stat(folder, &sb) == 0 && S_ISDIR(sb.st_mode)) {
+		printf("[debug] (%s,%s,%d) open %s ok\n", __FILE__, __func__, __LINE__, folder);
+	} else {
+		printf("[debug] (%s,%s,%d) open of %s failed: %s\n", __FILE__, __func__, __LINE__, folder, strerror(errno));
+	}
+	folder = "/boot";
+	if (stat(folder, &sb) == 0 && S_ISDIR(sb.st_mode)) {
+		printf("[debug] (%s,%s,%d) open %s ok\n", __FILE__, __func__, __LINE__, folder);
+	} else {
+		printf("[debug] (%s,%s,%d) open of %s failed: %s\n", __FILE__, __func__, __LINE__, folder, strerror(errno));
+	}
+
 	if (fullpath) {
 		fd = open(fullpath, O_CREAT|O_TRUNC|O_CLOEXEC|O_RDWR, 0600);
 		if (fd < 0) {
