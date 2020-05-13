@@ -720,26 +720,32 @@ get_paths(char **shim_fs_path, char **fwup_fs_path, char **fwup_esp_path)
 		efi_error("could not find shim or fwup on ESP");
 		errno = ENOENT;
 		ret = i;
+		printf("[debug] (%s,%s,%d) could not find shim or fwup on ESP:%d\n", __FILE__, __func__, __LINE__, errno);
 		goto out;
 	}
 	rc = asprintf(&fwup_esp_path_tmp, "%s%s.efi", fwup_esp_path_tmpl,
 		      arch_names[i]);
 	if (rc < 0) {
 		efi_error("asprintf failed");
+		printf("[debug] (%s,%s,%d) asprintf failed:%s\n", __FILE__, __func__, __LINE__, fwup_esp_path_tmp);
 		goto out;
 	}
 
 	if (shim_fs_path_tmp) {
+		printf("[debug] (%s,%s,%d) shim_fs_path_tmp:%s\n", __FILE__, __func__, __LINE__, shim_fs_path_tmp);
 		*shim_fs_path = strdup(shim_fs_path_tmp);
 		if (!*shim_fs_path) {
 			efi_error("strdup failed");
+			printf("[debug] (%s,%s,%d) strdup failed\n", __FILE__, __func__, __LINE__);
 			goto out;
 		}
 	}
 	if (fwup_fs_path_tmp) {
+		printf("[debug] (%s,%s,%d) fwup_fs_path_tmp:%s\n", __FILE__, __func__, __LINE__, fwup_fs_path_tmp);
 		*fwup_fs_path = strdup(fwup_fs_path_tmp);
 		if (!*fwup_fs_path) {
 			efi_error("strdup failed");
+			printf("[debug] (%s,%s,%d) strdup failed\n", __FILE__, __func__, __LINE__);
 			goto out;
 		}
 	}
