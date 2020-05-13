@@ -700,6 +700,7 @@ get_paths(char **shim_fs_path, char **fwup_fs_path, char **fwup_esp_path)
 
 	firmware_bits = get_value_from_file_at_dir("/sys/firmware/efi/",
 						   "fw_platform_size");
+	printf("[debug] (%s,%s,%d) firmware size:%lu\n", __FILE__, __func__, __LINE__, firmware_bits);
 	char **arch_names = firmware_bits == 64 ? arch_names_64
 						 : arch_names_32;
 	int n_arches = firmware_bits == 64 ? n_arches_64 : n_arches_32;
@@ -714,8 +715,10 @@ get_paths(char **shim_fs_path, char **fwup_fs_path, char **fwup_esp_path)
 	i = find_matching_file(shim_fs_path_tmpl, ".efi", arch_names,
 			       n_arches, &shim_fs_path_tmp);
 
+	printf("[debug] (%s,%s,%d) (%s,%s,%d,%s)\n", __FILE__, __func__, __LINE__, shim_fs_path_tmpl, arch_names[0], n_arches, shim_fs_path_tmp);
 	i = find_matching_file(fwup_fs_path_tmpl, ".efi", arch_names,
 				       n_arches, &fwup_fs_path_tmp);
+	printf("[debug] (%s,%s,%d) (%s,%s,%d,%s)\n", __FILE__, __func__, __LINE__, fwup_fs_path_tmpl, arch_names[0], n_arches, fwup_fs_path_tmp);
 	if (i < 0) {
 		efi_error("could not find shim or fwup on ESP");
 		errno = ENOENT;
